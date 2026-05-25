@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+
+  backend:
+
+    build: ./backend
+
+    container_name: ai_backend
+
+    ports:
+
+      - "5000:5000"
+
+    env_file:
+
+      - ./backend/.env
+
+  frontend:
+
+    build: ./frontend
+
+    container_name: ai_frontend
+
+    ports:
+
+      - "5173:5173"
+
+    depends_on:
+
+      - backend
