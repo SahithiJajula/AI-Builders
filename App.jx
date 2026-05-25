@@ -1,0 +1,195 @@
+import {useState} from "react"
+import axios from "axios"
+
+import Navbar from "./components/Navbar"
+import RepoInput from "./components/RepoInput"
+import ScoreCard from "./components/ScoreCard"
+import Findings from "./components/Findings"
+import Loader from "./components/Loader"
+
+import "./App.css"
+
+function App(){
+
+const [repo,setRepo]=useState("")
+const [loading,setLoading]=useState(false)
+
+const [result,setResult]=useState({
+
+score:null,
+
+security:[],
+
+bugs:[],
+
+performance:[],
+
+summary:""
+
+})
+
+async function analyzeRepo(){
+
+if(!repo){
+
+alert("Enter repository")
+
+return
+
+}
+
+setLoading(true)
+
+try{
+
+const response=await axios.post(
+
+"http://localhost:5000/analyze",
+
+{
+repo
+}
+
+)
+
+setResult(response.data)
+
+}
+
+catch(error){
+
+console.log(error)
+
+alert("Backend not connected")
+
+}
+
+setLoading(false)
+
+}
+
+return(
+
+<div>
+
+<Navbar/>
+
+<div className="container">
+
+<h1>
+
+AI Powered Code Review Assistant
+
+</h1>
+
+<p>
+
+Analyze repositories intelligently
+
+</p>
+
+<RepoInput
+
+repo={repo}
+
+setRepo={setRepo}
+
+analyzeRepo={analyzeRepo}
+
+/>
+
+{
+
+loading &&
+
+<Loader/>
+
+}
+
+{
+
+result.score!==null &&
+
+<>
+
+<div className="cards">
+
+<ScoreCard
+
+title="Overall Score"
+
+score={result.score}
+
+/>
+
+<ScoreCard
+
+title="Security"
+
+score={result.security.length}
+
+/>
+
+<ScoreCard
+
+title="Bugs"
+
+score={result.bugs.length}
+
+/>
+
+</div>
+
+<Findings
+
+title="Security Issues"
+
+items={result.security}
+
+/>
+
+<Findings
+
+title="Bugs"
+
+items={result.bugs}
+
+/>
+
+<Findings
+
+title="Performance"
+
+items={result.performance}
+
+/>
+
+<div className="summary">
+
+<h3>
+
+AI Summary
+
+</h3>
+
+<p>
+
+{result.summary}
+
+</p>
+
+</div>
+
+</>
+
+}
+
+</div>
+
+</div>
+
+)
+
+}
+
+export default App
